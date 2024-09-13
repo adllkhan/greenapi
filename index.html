@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREEN-API Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="flex flex-row m-6">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col max-w-fit items-center justify-center gap-2">
+                <input class="bg-gray-100 w-full p-2 rounded" type="text" id="idInstance" placeholder="idInstance">
+                <input class="bg-gray-100 w-full p-2 rounded" type="text" id="apiToken" placeholder="ApiTokenInstance">
+            </div>
+            <div class="flex flex-col justify-between gap-4">
+                <button class="bg-green-300 w-full p-2 rounded" type="button" onclick="callApi('getSettings')">Get Settings</button>
+                <button class="bg-green-300 w-full p-2 rounded" type="button" onclick="callApi('getStateInstance')">Get State Instance</button>
+                <div class="flex flex-col gap-2">
+                    <input class="bg-gray-100 w-full p-2 rounded" type="text" id="phoneNumber" placeholder="Phone number">
+                    <textarea class="bg-gray-100 w-full p-2 rounded" id="messageText" placeholder="Message" rows="4"></textarea>
+                    <button class="bg-green-300 w-full p-2 rounded" type="button" onclick="sendMessage()">Send Message</button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <input class="bg-gray-100 w-full p-2 rounded" type="text" id="phoneNumberFile" placeholder="Phone number">
+                    <input class="bg-gray-100 w-full p-2 rounded" type="text" id="fileUrl" placeholder="File URL">
+                    <button class="bg-green-300 w-full p-2 rounded" type="button" onclick="sendFileByUrl()">Send File</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="response" class="h-full w-full ml-4">
+            <textarea class="w-full h-full rounded bg-gray-100 p-2" id="apiResponse" rows="10" placeholder="Response" readonly></textarea>
+        </div>
+    </div>
+    <script>
+        function callApi(method) {
+            const idInstance = document.getElementById('idInstance').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const url = `https://7103.api.greenapi.com/waInstance${idInstance}/${method}/${apiToken}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('apiResponse').value = JSON.stringify(data, null, 4);
+                })
+                .catch(error => {
+                    document.getElementById('apiResponse').value = 'Error: ' + error;
+                });
+        }
+
+        function sendMessage() {
+            const idInstance = document.getElementById('idInstance').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const messageText = document.getElementById('messageText').value;
+
+            const url = `https://7103.api.greenapi.com/waInstance${idInstance}/sendMessage/${apiToken}`;
+
+            const data = {
+                chatId: `${phoneNumber}@c.us`,
+                message: messageText
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('apiResponse').value = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                document.getElementById('apiResponse').value = 'Error: ' + error;
+            });
+        }
+
+        function sendFileByUrl() {
+            const idInstance = document.getElementById('idInstance').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const phoneNumber = document.getElementById('phoneNumberFile').value;
+            const fileUrl = document.getElementById('fileUrl').value;
+
+            const url = `https://7103.api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${apiToken}`;
+
+            const data = {
+                chatId: `${phoneNumber}@c.us`,
+                urlFile: fileUrl,
+                fileName: 'file'
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('apiResponse').value = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                document.getElementById('apiResponse').value = 'Error: ' + error;
+            });
+        }
+    </script>
+
+</body>
+</html>
